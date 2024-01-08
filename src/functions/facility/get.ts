@@ -1,11 +1,11 @@
-import { kxml } from "../../decorators/render-kxml.js";
-import { ILaochanService } from "../../types.js";
-import { singleton } from "tsyringe";
+import { kxml } from '../../decorators/render-kxml.js';
+import { ILaochanService } from '../../types.js';
+import { singleton } from 'tsyringe';
 
 @singleton()
 export default class implements ILaochanService {
   @kxml('facility/get')
-  async process() {
+  async process(): Promise<object> {
     return {
       status: 0,
       location: {
@@ -48,12 +48,16 @@ export default class implements ILaochanService {
           notchAmount: 0,
           notchCount: 0,
           supplyLimit: 100000,
-        }
+        },
       },
       calendar: {
         year: 2024,
-        holiday: [0, 1, 8, 41, 53, 79, 118, 122, 123, 124, 197, 222, 260, 265, 281, 306, 326, 365, 372, 406, 407, 418, 444, 484, 488, 489, 490, 491, 561, 588, 589, 624, 630, 631, 652, 672, 673, 692],
-      }
+        holiday: [
+          0, 1, 8, 41, 53, 79, 118, 122, 123, 124, 197, 222, 260, 265, 281, 306,
+          326, 365, 372, 406, 407, 418, 444, 484, 488, 489, 490, 491, 561, 588,
+          589, 624, 630, 631, 652, 672, 673, 692,
+        ],
+      },
     };
   }
 }

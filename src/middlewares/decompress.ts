@@ -1,8 +1,8 @@
-import { Next } from "koa";
-import { Context } from "../types.js";
-import { lz77Decode } from "../utils/lz77.js";
+import { Next } from 'koa';
+import { Context } from '../types.js';
+import { lz77Decode } from '../utils/lz77.js';
 
-export async function decompress(ctx: Context, next: Next) {
+export async function decompress(ctx: Context, next: Next): Promise<any> {
   if (!(ctx.request.body instanceof Buffer)) {
     return next();
   }

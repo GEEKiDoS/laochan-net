@@ -10,21 +10,18 @@ export function lz77Decode(data: Buffer): Buffer {
       if (flag & (1 << bit)) {
         output.push(data[offset]);
         offset += 1;
-
       } else {
-        if (offset >= data.length)
-          break;
+        if (offset >= data.length) break;
 
         const lookbackFlag = data.readUInt16BE(offset);
         const lookbackLength = (lookbackFlag & 0x000f) + 3;
         const lookbackOffset = lookbackFlag >> 4;
 
         offset += 2;
-        if (lookbackFlag == 0)
-          break;
+        if (lookbackFlag == 0) break;
 
         for (let i = 0; i < lookbackLength; i++) {
-          let loffset = output.length - lookbackOffset;
+          const loffset = output.length - lookbackOffset;
 
           if (loffset <= 0 || loffset >= output.length) {
             output.push(0);

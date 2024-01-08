@@ -1,8 +1,8 @@
-import { Next } from "koa";
-import { Context } from "../types.js";
-import { rc4Transfrom } from "../utils/rc4.js";
+import { Next } from 'koa';
+import { Context } from '../types.js';
+import { rc4Transfrom } from '../utils/rc4.js';
 
-export async function crypto(ctx: Context, next: Next) {
+export async function crypto(ctx: Context, next: Next): Promise<any> {
   if (typeof ctx.req.headers['x-eamuse-info'] !== 'string') {
     return next();
   }
@@ -31,8 +31,12 @@ export async function crypto(ctx: Context, next: Next) {
     return;
   }
 
-  const time = Math.floor(new Date().valueOf() / 1000).toString(16).padStart(8, '0');
-  const salt = Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0');
+  const time = Math.floor(new Date().valueOf() / 1000)
+    .toString(16)
+    .padStart(8, '0');
+  const salt = Math.floor(Math.random() * 0xffff)
+    .toString(16)
+    .padStart(4, '0');
 
   const encrypted = rc4Transfrom(time + salt, ctx.body);
   ctx.body = encrypted;

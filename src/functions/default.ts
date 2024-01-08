@@ -1,11 +1,11 @@
-import { singleton } from "tsyringe";
-import { Context, ILaochanService } from "../types.js";
-import dedent from 'dedent-js'
-import { to_bin } from "@kamyu/kbinxml";
+import { singleton } from 'tsyringe';
+import { Context, ILaochanService } from '../types.js';
+import dedent from 'dedent-js';
+import { to_bin } from '@kamyu/kbinxml';
 
 @singleton()
 export class DefaultService implements ILaochanService {
-  async process(ctx: Context) {
+  async process(ctx: Context): Promise<Buffer> {
     const tmp = ctx.service.split('.');
     const module = tmp[0];
     const method = tmp[1];

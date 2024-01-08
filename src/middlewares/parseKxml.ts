@@ -1,6 +1,6 @@
-import { Next } from "koa";
-import { Context } from "../types.js";
-import { to_xml } from "@kamyu/kbinxml";
+import { Next } from 'koa';
+import { Context } from '../types.js';
+import { to_xml } from '@kamyu/kbinxml';
 import { XMLParser } from 'fast-xml-parser';
 
 const parser = new XMLParser({
@@ -11,46 +11,59 @@ const parser = new XMLParser({
   allowBooleanAttributes: true,
 });
 
-function parseValue(node: any) {
+function parseValue(node: { $__type: string; $__count?: unknown }): any {
   const isArray = '$__count' in node;
 
-  if (['s8', 'u8', 's16', 'u16', 's32', 'u32', 's64', 'u64', 'float', 'double'].includes(node.$__type)) {
-      if (isArray) {
-        return node['#text'].split(' ').map(v => new Number(v));
-      }
+  if (
+    [
+      's8',
+      'u8',
+      's16',
+      'u16',
+      's32',
+      'u32',
+      's64',
+      'u64',
+      'float',
+      'double',
+    ].includes(node.$__type)
+  ) {
+    if (isArray) {
+      return node['#text'].split(' ').map((v) => new Number(v));
+    }
 
-      return new Number(node['#text']);
+    return new Number(node['#text']);
   }
 
-  if(['b', 'bool'].includes(node.$__type)) {
+  if (['b', 'bool'].includes(node.$__type)) {
     return !!parseInt(node['#text']);
   }
 
   if (['bin', 'binary'].includes(node.$__type)) {
-    return Buffer.from(node['#text'], 'hex')
+    return Buffer.from(node['#text'], 'hex');
   }
 
-  if(['ip4', 'str', 'string'].includes(node.$__type)) {
+  if (['ip4', 'str', 'string'].includes(node.$__type)) {
     return node['#text'];
   }
 
-  if(node.$__type == 'time') {
+  if (node.$__type == 'time') {
     return new Date(parseInt(node['#text']) * 1000);
   }
 
   return {
     type: node.$__type,
     value: node['#text'],
-  }
+  };
 }
 
-function kxmlToObject(node: any) {
+function kxmlToObject(node: Record<string, unknown>): any {
   if (node instanceof Array) {
-    return node.map(v => kxmlToObject(v));
+    return node.map((v) => kxmlToObject(v));
   }
 
   if ('$__type' in node) {
-    return parseValue(node);
+    return parseValue(node as { $__type: string; $__count?: unknown });
   }
 
   const obj: object = {};
@@ -64,13 +77,13 @@ function kxmlToObject(node: any) {
       continue;
     }
 
-    obj[key] = kxmlToObject(node[key]);
+    obj[key] = kxmlToObject(node[key] as Record<string, unknown>);
   }
 
   return obj;
 }
 
-export async function parseKxml(ctx: Context, next: Next) {
+export async function parseKxml(ctx: Context, next: Next): Promise<object> {
   if (!(ctx.request.body instanceof Buffer)) {
     return next();
   }
