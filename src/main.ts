@@ -19,7 +19,7 @@ function tryResolve<T>(token: InjectionToken<T>): T | undefined {
 
 function register<T>(
   token: InjectionToken<T>,
-  provider: Provider<T> | { new (...args: any[]): T },
+  provider: Provider<T> | { new(...args: any[]): T },
 ): T {
   if (container.isRegistered(token)) return container.resolve(token);
 
@@ -31,6 +31,19 @@ async function main(): Promise<void> {
   const logger = new Logger('main');
 
   const app = new Koa<DefaultState, ILaochanContext>()
+    .use(async (ctx, next) => {
+      try {
+        await next();
+      } catch (e) {
+        logger.error(
+          'unexcepted error: %s',
+          JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
+        );
+
+        ctx.status = e.status ?? 500;
+        ctx.body = `${e.stack ?? 'Internal Error'}`;
+      }
+    })
     .use(binaryBody)
     .use(crypto)
     .use(decompress)
@@ -48,8 +61,8 @@ async function main(): Promise<void> {
       ctx.service = ctx.query.f;
       ctx.logger = ctx.service
         ? register(`logger:${ctx.service}`, {
-            useValue: new Logger(ctx.service),
-          })
+          useValue: new Logger(ctx.service),
+        })
         : logger;
 
       let service: ILaochanService | undefined = ctx.service
@@ -84,18 +97,8 @@ async function main(): Promise<void> {
         JSON.stringify(ctx.request.body),
       );
 
-      try {
-        ctx.body = await service.process(ctx);
-        ctx.status = 200;
-      } catch (e) {
-        logger.error(
-          'unexcepted error: %s',
-          JSON.stringify(e, Object.getOwnPropertyNames(e), 2),
-        );
-
-        ctx.status = e.status ?? 500;
-        ctx.body = `${e.stack ?? 'Internal Error'}`;
-      }
+      ctx.body = await service.process(ctx);
+      ctx.status = 200;
 
       logger.info('%s [server]: status = %d', ctx.service, ctx.status);
       return await next();
