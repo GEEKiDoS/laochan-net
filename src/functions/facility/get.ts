@@ -32,8 +32,8 @@ export default class implements ILaochanService {
       },
       portfw: {
         globalIp: '127.0.0.1',
-        globalport: 5700,
-        privateport: 5700,
+        globalPort: 5700,
+        privatePort: 5700,
       },
       public: {
         flag: 0,

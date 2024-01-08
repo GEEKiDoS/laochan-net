@@ -1,14 +1,14 @@
 import pug from 'pug';
 import { to_bin } from "@kamyu/kbinxml";
 
-export function kxml(templatePath: string): MethodDecorator {
+export function kxml(templatePath: string, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): MethodDecorator {
   const template = pug.compileFile('templates/' + templatePath + '.pug');
 
   return function (_target, _propertyKey, descriptor) {
     const orig = descriptor.value as Function;
     descriptor.value = async function (...args: any[]) {
       const obj = await orig.apply(this, args);
-      const xml = '<?xml version="1.0" encoding="SHIFT_JIS"?>' + template(obj);
+      const xml = `<?xml version="1.0" encoding="${encoding}"?>` + template(obj);
       console.log(xml);
       const kxml = to_bin(xml);
 
