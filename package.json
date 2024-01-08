@@ -8,7 +8,9 @@
   },
   "devDependencies": {
     "@types/jest": "~29.5",
+    "@types/koa": "^2.13.12",
     "@types/node": "~20",
+    "@types/pug": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "~6.15",
     "@typescript-eslint/parser": "~6.15",
     "eslint": "~8.56",
@@ -19,10 +21,12 @@
     "rimraf": "~5.0",
     "ts-api-utils": "~1.0",
     "ts-jest": "~29.1",
+    "tsx": "^4.7.0",
     "typescript": "~5.3"
   },
   "scripts": {
     "start": "node build/src/main.js",
+    "watch": "tsx watch src/main.ts",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
     "build": "tsc -p tsconfig.json",
@@ -36,7 +40,16 @@
   "author": "Jakub Synowiec <jsynowiec@users.noreply.github.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "tslib": "~2.6"
+    "@cordisjs/logger": "^0.1.3",
+    "@kamyu/kbinxml": "^2.0.2",
+    "arc4": "^3.4.0",
+    "dedent-js": "^1.0.1",
+    "fast-xml-parser": "^4.3.2",
+    "koa": "^2.15.0",
+    "pug": "^3.0.2",
+    "reflect-metadata": "^0.2.1",
+    "tslib": "~2.6",
+    "tsyringe": "^4.8.0"
   },
   "volta": {
     "node": "20.10.0"

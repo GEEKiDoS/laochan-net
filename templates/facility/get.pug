@@ -1,0 +1,47 @@
+response
+    facility(method="get", status=status)
+        location
+            id(__type="str")= location.id
+            type(__type="u8")= location.type
+            country(__type="str")= location.country
+            region(__type="str")= location.region
+            name(__type="str")= location.name
+            countryname(__type="str")= location.countryName
+            countryjname(__type="str")= location.countryJName
+            regionname(__type="str")= location.regionName
+            regionjname(__type="str")= location.regionJName
+            customercode(__type="str")= location.customerCode
+            companycode(__type="str")= location.companyCode
+            latitude(__type="s32")= location.latitude
+            longitude(__type="s32")= location.longitude
+            accuracy(__type="u8")= location.accuracy
+        line
+            id(__type="str")= line.id
+            class(__type="u8")= line.class
+            upclass(__type="u8")= line.upClass
+            rtt(__type="u16")= line.rtt
+        portfw
+            globalip(__type="ip4")= portfw.globalIp
+            globalport(__type="u16")= portfw.globalPort
+            privateport(__type="u16")= portfw.privatePort
+        public
+            flag(__type="u8")= public.flag
+            name(__type="str")= public.name
+            latitude(__type="str")= public.latitude
+            longitude(__type="str")= public.longitude
+        share
+            url
+                epass(__type="str")= share.url
+                arcadefan(__type="str")= share.url
+                konaminetdx(__type="str")= share.url
+                konamiid(__type="str")= share.url
+                eagate(__type="str")= share.url
+            eapass
+                valid(__type="u16")= share.eapass
+            eacoin
+                notchamount(__type="s32")= share.eacoin.notchAmount
+                notchcount(__type="s32")= share.eacoin.notchCount
+                supplylimit(__type="s32")= share.eacoin.supplyLimit
+        calendar
+            year(__type="s16")= calendar.year
+            holiday(__type="s16" __count=calendar.holiday.length)= calendar.holiday.join(' ')
