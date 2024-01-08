@@ -9,6 +9,7 @@ import { Logger } from "@cordisjs/logger";
 import { crypto } from "./middlewares/crypto.js";
 import { binaryBody } from "./middlewares/binarybody.js";
 import { parseKxml } from "./middlewares/parseKxml.js";
+import { decompress } from "./middlewares/decompress.js";
 
 function tryResolve<T>(token: InjectionToken<T>): T | undefined {
   if (!container.isRegistered(token))
@@ -33,6 +34,7 @@ async function main() {
   const app = new Koa<DefaultState, ILaochanContext>()
     .use(binaryBody)
     .use(crypto)
+    .use(decompress)
     .use(parseKxml)
     .use(async (ctx, next) => {
       if (typeof ctx.query.f !== 'string') {
