@@ -9,7 +9,6 @@ export function kxml(templatePath: string, encoding: 'UTF-8' | 'SHIFT_JIS' = 'UT
     descriptor.value = async function (...args: any[]) {
       const obj = await orig.apply(this, args);
       const xml = `<?xml version="1.0" encoding="${encoding}"?>` + template(obj);
-      console.log(xml);
       const kxml = to_bin(xml);
 
       return Buffer.from(kxml.data);
