@@ -1,16 +1,19 @@
-import { kxml } from '../../decorators/render-kxml.js';
+import { kxml } from '../../decorators/to-kxml.js';
 import { ILaochanService } from '../../types.js';
 import { singleton } from 'tsyringe';
 
 @singleton()
 export default class implements ILaochanService {
-  @kxml('pcbtracker/alive')
+  @kxml()
   async process(): Promise<object> {
     return {
-      status: 0,
-      expire: 3600,
-      time: Math.floor(new Date().valueOf() / 1000),
-      ecEnable: 1,
+      pcbtracker: {
+        $ecenable: 1,
+        $expire: 3600,
+        $method: 'alive',
+        $status: 0,
+        $time: Math.floor(new Date().valueOf() / 1000),
+      }
     };
   }
 }

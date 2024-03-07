@@ -1,7 +1,7 @@
 import pug from 'pug';
 import { to_bin } from '@kamyu/kbinxml';
 
-export function kxml(
+export function kxmlTemplate(
   templatePath: string,
   encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8',
 ): MethodDecorator {
