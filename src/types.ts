@@ -3,7 +3,10 @@ import { DefaultState, ParameterizedContext } from 'koa';
 
 export interface ILaochanContext {
   model?: string;
-  service?: string;
+  service?: {
+    name: string,
+    method: string,
+  };
   pcbid?: string;
   logger: Logger;
 
@@ -13,7 +16,3 @@ export interface ILaochanContext {
 }
 
 export type Context = ParameterizedContext<DefaultState, ILaochanContext, any>;
-
-export interface ILaochanService {
-  process(ctx: Context): Promise<any>;
-}

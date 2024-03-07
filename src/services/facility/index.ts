@@ -1,11 +1,10 @@
 import { kxmlTemplate } from '../../decorators/render-kxml.js';
-import { ILaochanService } from '../../types.js';
 import { singleton } from 'tsyringe';
 
 @singleton()
-export default class implements ILaochanService {
+export default class {
   @kxmlTemplate('facility/get')
-  async process(): Promise<object> {
+  async get(): Promise<object> {
     return {
       status: 0,
       location: {

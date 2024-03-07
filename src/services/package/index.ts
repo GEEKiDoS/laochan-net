@@ -2,4 +2,6 @@ import { singleton } from 'tsyringe';
 import { DefaultService } from '../default.js';
 
 @singleton()
-export default class extends DefaultService {}
+export default class extends DefaultService {
+    list = this.default;
+}

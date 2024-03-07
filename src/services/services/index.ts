@@ -1,12 +1,11 @@
-import { ILaochanService } from '../../types.js';
 import { singleton } from 'tsyringe';
 import config from '../../utils/config.js';
 import { kxml } from '../../decorators/to-kxml.js';
 
 @singleton()
-export default class implements ILaochanService {
+export default class {
   @kxml()
-  async process() {
+  async get() {
     const selfServices = [
       'services', 'dlstatus', 'cardmng',
       'eacoin', 'userdata', 'userid', 'pcbtracker', 'pcbevent',

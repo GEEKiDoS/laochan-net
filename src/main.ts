@@ -3,13 +3,14 @@ import 'reflect-metadata';
 import Koa, { DefaultState } from 'koa';
 import { InjectionToken, Provider, container } from 'tsyringe';
 
-import { ILaochanContext, ILaochanService } from './types.js';
-import { DefaultService } from './functions/default.js';
+import { ILaochanContext } from './types.js';
+import { DefaultService } from './services/default.js';
 import { Logger } from '@cordisjs/logger';
 import { crypto } from './middlewares/crypto.js';
 import { binaryBody } from './middlewares/binarybody.js';
 import { parseKxml } from './middlewares/parseKxml.js';
 import { decompress } from './middlewares/decompress.js';
+import config from './utils/config.js';
 
 function tryResolve<T>(token: InjectionToken<T>): T | undefined {
   if (!container.isRegistered(token)) return undefined;
@@ -57,24 +58,39 @@ async function main(): Promise<void> {
         throw new Error('invaild model');
       }
 
+      let [serviceName, method] = ctx.query.f.split('.');
+
       ctx.model = ctx.query.model;
-      ctx.service = ctx.query.f;
+      ctx.service = {
+        name: serviceName,
+        method,
+      };
+
       ctx.logger = ctx.service
-        ? register(`logger:${ctx.service}`, {
-          useValue: new Logger(ctx.service),
+        ? register(`logger:${ctx.service.name}`, {
+          useValue: new Logger(ctx.service.name),
         })
         : logger;
 
-      let service: ILaochanService | undefined = ctx.service
-        ? tryResolve(ctx.service)
+      let service: object | undefined = ctx.service
+        ? tryResolve(ctx.service.name)
         : container.resolve(DefaultService);
 
       if (service === undefined) {
         try {
-          const module = await import(
-            `./functions/${ctx.service.replace('.', '/')}.js`
-          );
-          service = register(ctx.service, {
+          let module: any = null;
+
+          try {
+            module = await import(
+              `./services/${ctx.service.name}/index.js`
+            );
+          } catch {
+            module = await import(
+              `./services/${ctx.service.name}.js`
+            );
+          }
+          
+          service = register(ctx.service.name, {
             useClass: module.default,
           });
         } catch (e) {
@@ -85,9 +101,11 @@ async function main(): Promise<void> {
         }
       }
 
-      if (service === undefined) {
-        logger.warn(`unimplemented service ${ctx.service}`);
+      if (service === undefined || !(method in service)) {
+        logger.warn(`unimplemented method ${ctx.service.method} in ${ctx.service.name}`);
+
         service = container.resolve(DefaultService);
+        method = 'default';
       }
 
       logger.info(
@@ -97,14 +115,14 @@ async function main(): Promise<void> {
         JSON.stringify(ctx.request.body),
       );
 
-      ctx.body = await service.process(ctx);
+      ctx.body = await service[method](ctx);
       ctx.status = 200;
 
       logger.info('%s [server]: status = %d', ctx.service, ctx.status);
       return await next();
     });
 
-  app.listen(10573);
+  app.listen(config.port);
 }
 
 main();
