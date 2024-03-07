@@ -99,6 +99,9 @@ export async function parseKxml(ctx: Context, next: Next): Promise<object> {
 
   if ('call' in body) {
     ctx.pcbid = body.call.srcid;
+    ctx.tag = body.call.tag;
+
+    ctx.body = body.call;
   }
 
   return next();

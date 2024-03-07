@@ -69,6 +69,10 @@ function serializeObject(obj: Object, name: string, linePrefix: string = '') {
         output += ` __count="${value[1].length}"`;
     }
 
+    if (value && value[1] instanceof Buffer) {
+        output += ` __size="${value[1].length}"`;
+    }
+
     output += '>';
 
     if (value) {
@@ -121,32 +125,31 @@ export function kxml(topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JI
     };
 }
 
-
-console.log(serializeObject({
-    $attr: 'attr1',
-    sb: {
-        $attr: 'attr2',
-        $__type: 'str',
-        __value: 'sba',
-    },
-    sb1: {
-        $attr: 'attr3',
-        nested: {
-            $attr: 'attr4',
-            $__type: 's32',
-            __value: [1, 1, 4, 5, 1, 4],
-        }
-    },
-    array: [{
-        $attr: 'test'
-    }, {
-        $attr: 'test2'
-    }, {
-        $attr: 'test3'
-    }, {
-        $attr: 'test4'
-    }, {
-        $attr: 'test5'
-    }]
-}, 'test'))
+// console.log(serializeObject({
+//     $attr: 'attr1',
+//     sb: {
+//         $attr: 'attr2',
+//         $__type: 'str',
+//         __value: 'sba',
+//     },
+//     sb1: {
+//         $attr: 'attr3',
+//         nested: {
+//             $attr: 'attr4',
+//             $__type: 's32',
+//             __value: [1, 1, 4, 5, 1, 4],
+//         }
+//     },
+//     array: [{
+//         $attr: 'test'
+//     }, {
+//         $attr: 'test2'
+//     }, {
+//         $attr: 'test3'
+//     }, {
+//         $attr: 'test4'
+//     }, {
+//         $attr: 'test5'
+//     }]
+// }, 'test'))
 

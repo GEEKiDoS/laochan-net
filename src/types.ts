@@ -3,11 +3,14 @@ import { DefaultState, ParameterizedContext } from 'koa';
 
 export interface ILaochanContext {
   model?: string;
-  service?: {
+  tag?: string;
+  pcbid?: string;
+
+  service: {
     name: string,
     method: string,
   };
-  pcbid?: string;
+
   logger: Logger;
 
   request: {

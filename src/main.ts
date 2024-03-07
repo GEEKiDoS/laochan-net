@@ -65,7 +65,8 @@ async function main(): Promise<void> {
         name: serviceName,
         method,
       };
-
+      
+      ctx.body = ctx.body[ctx.service.name];
       ctx.logger = ctx.service
         ? register(`logger:${ctx.service.name}`, {
           useValue: new Logger(ctx.service.name),
@@ -101,19 +102,20 @@ async function main(): Promise<void> {
         }
       }
 
+      logger.info(
+        '%s.$s [%s]: request = %s',
+        ctx.service.name,
+        ctx.service.method,
+        ctx.pcbid,
+        JSON.stringify(ctx.request.body),
+      );
+
       if (service === undefined || !(method in service)) {
         logger.warn(`unimplemented method ${ctx.service.method} in ${ctx.service.name}`);
 
         service = container.resolve(DefaultService);
         method = 'default';
       }
-
-      logger.info(
-        '%s [%s]: request = %s',
-        ctx.service,
-        ctx.pcbid,
-        JSON.stringify(ctx.request.body),
-      );
 
       ctx.body = await service[method](ctx);
       ctx.status = 200;
