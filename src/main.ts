@@ -11,6 +11,7 @@ import { binaryBody } from './middlewares/binarybody.js';
 import { parseKxml } from './middlewares/parseKxml.js';
 import { decompress } from './middlewares/decompress.js';
 import config from './utils/config.js';
+import { MongoClient, Db } from 'mongodb';
 
 function tryResolve<T>(token: InjectionToken<T>): T | undefined {
   if (!container.isRegistered(token)) return undefined;
@@ -29,7 +30,20 @@ function register<T>(
 }
 
 async function main(): Promise<void> {
-  const logger = new Logger('main');
+  const logger = new Logger('laochan-net');
+
+  logger.info('initialization...');
+
+  {
+    logger.info('connecting to mongodb...');
+    const client = await MongoClient.connect(config.mongoUrl);
+
+    container.register(Db, {
+      useValue: client.db(config.dbName),
+    });
+  }
+
+  logger.info('creating koa app...');
 
   const app = new Koa<DefaultState, ILaochanContext>()
     .use(async (ctx, next) => {
@@ -126,6 +140,7 @@ async function main(): Promise<void> {
       return await next();
     });
 
+  logger.info('listening on %d', config.port);
   app.listen(config.port);
 }
 
