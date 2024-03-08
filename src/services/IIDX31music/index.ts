@@ -1,19 +1,19 @@
-import { kxml } from "../../decorators/to-kxml.js";
+import { serviceKxml } from "../../decorators/to-kxml.js";
+
+const resp = serviceKxml('IIDX31music');
 
 export default class {
-    @kxml()
-    async crate() {
-        return {
-            IIDX31music: {
-                $expire: 1800,
-                c: [
-                    // {
-                    //     $__type: 's32',
-                    //     $mid: 11451,
-                    //     __value: new Array(20).fill(-1),
-                    // }
-                ],
-            }
-        };
-    }
+  @resp('crate')
+  async crate() {
+    return {
+      $expire: 1800,
+      c: [
+        // {
+        //     $__type: 's32',
+        //     $mid: 11451,
+        //     __value: new Array(20).fill(-1),
+        // }
+      ],
+    };
+  }
 }

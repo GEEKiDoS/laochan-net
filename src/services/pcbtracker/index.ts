@@ -1,18 +1,15 @@
-import { kxml } from '../../decorators/to-kxml.js';
-import { singleton } from 'tsyringe';
+import { serviceKxml } from '../../decorators/to-kxml.js';
 
-@singleton()
+const resp = serviceKxml('pcbtracker');
+
 export default class {
-  @kxml()
-  async process(): Promise<object> {
+  @resp('alive')
+  async alive(): Promise<object> {
     return {
-      pcbtracker: {
-        $ecenable: 1,
-        $expire: 3600,
-        $method: 'alive',
-        $status: 0,
-        $time: Math.floor(new Date().valueOf() / 1000),
-      }
+      $ecenable: 1,
+      $expire: 3600,
+      $status: 0,
+      $time: Math.floor(new Date().valueOf() / 1000),
     };
   }
 }

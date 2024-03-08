@@ -2,127 +2,142 @@ import _ from 'lodash';
 import { to_bin } from '@kamyu/kbinxml';
 
 function serializeValue(value: any, type: string): string {
-    if (
-        [
-            's8',
-            'u8',
-            's16',
-            'u16',
-            's32',
-            'u32',
-            's64',
-            'u64',
-            'float',
-            'double',
-        ].includes(type)
-    ) {
-        return value.toString();
+  if (
+    [
+      's8',
+      'u8',
+      's16',
+      'u16',
+      's32',
+      'u32',
+      's64',
+      'u64',
+      'float',
+      'double',
+    ].includes(type)
+  ) {
+    return value.toString();
+  }
+
+  if (['b', 'bool'].includes('type')) {
+    return value ? '1' : '0';
+  }
+
+  if (['bin', 'binary'].includes(type)) {
+    if (!(value instanceof Buffer)) {
+      throw new Error('binary with non-buffer value');
     }
 
-    if (['b', 'bool'].includes('type')) {
-        return value ? '1' : '0';
+    return value.toString('hex');
+  }
+
+  if (['ip4', 'str', 'string'].includes(type)) {
+    return value;
+  }
+
+  if (type == 'time') {
+    if (value instanceof Date) {
+      return Math.floor(value.valueOf() / 1000).toString();
     }
 
-    if (['bin', 'binary'].includes(type)) {
-        if (!(value instanceof Buffer)) {
-            throw new Error('binary with non-buffer value');
-        }
-
-        return value.toString('hex');
+    if (typeof value === 'number') {
+      return value.toString();
     }
 
-    if (['ip4', 'str', 'string'].includes(type)) {
-        return value;
-    }
+    throw new Error('time with not date or number');
+  }
 
-    if (type == 'time') {
-        if (value instanceof Date) {
-            return Math.floor(value.valueOf() / 1000).toString();
-        }
-
-        if (typeof value === 'number') {
-            return value.toString();
-        }
-
-        throw new Error('time with not date or number');
-    }
-
-    throw new Error(`unsupported type ${type}`);
+  throw new Error(`unsupported type ${type}`);
 }
 
 function serializeObject(obj: Object, name: string, linePrefix: string = '') {
-    let output = `${linePrefix}<${name}`;
+  let output = `${linePrefix}<${name}`;
 
-    const entries = Object.entries(obj);
-    const attrs = entries
-        .filter(v => v[0].startsWith('$'))
-        .map(v => [v[0].substring(1), v[1]]);
+  const entries = Object.entries(obj);
+  const attrs = entries
+    .filter(v => v[0].startsWith('$'))
+    .map(v => [v[0].substring(1), v[1]]);
 
-    for (const attr of attrs) {
-        output += ` ${attr[0]}="${_.escape(attr[1])}"`;
+  for (const attr of attrs) {
+    output += ` ${attr[0]}="${_.escape(attr[1])}"`;
+  }
+
+  // handle kxml value shit
+  const value = entries.find(v => v[0] == '__value');
+
+  if (value && value[1] instanceof Array) {
+    output += ` __count="${value[1].length}"`;
+  }
+
+  if (value && value[1] instanceof Buffer) {
+    output += ` __size="${value[1].length}"`;
+  }
+
+  output += '>';
+
+  if (value) {
+    const type = attrs.find(v => v[0] == '__type');
+
+    if (!type) {
+      // or normal xml innerXml?
+      throw new Error(`value with no type in ${name}`);
     }
 
-    // handle kxml value shit
-    const value = entries.find(v => v[0] == '__value');
+    output += (value[1] instanceof Array ? value[1] : [value[1]])
+      .map(v => serializeValue(v, type[1]))
+      .join(' ');
+  } else {
+    const elements = entries
+      .filter(v => !v[0].startsWith('$'));
 
-    if (value && value[1] instanceof Array) {
-        output += ` __count="${value[1].length}"`;
-    }
+    if (elements.length) {
+      output += '\n';
 
-    if (value && value[1] instanceof Buffer) {
-        output += ` __size="${value[1].length}"`;
-    }
+      for (const element of elements) {
+        if (element[1] instanceof Array) {
+          for (const item of element[1])
+            output += serializeObject(item, element[0], linePrefix + '  ');
 
-    output += '>';
-
-    if (value) {
-        const type = attrs.find(v => v[0] == '__type');
-
-        if (!type) {
-            // or normal xml innerXml?
-            throw new Error(`value with no type in ${name}`);
+          continue;
         }
 
-        output += (value[1] instanceof Array ? value[1] : [value[1]])
-            .map(v => serializeValue(v, type[1]))
-            .join(' ');
-    } else {
-        const elements = entries
-            .filter(v => !v[0].startsWith('$'));
+        output += serializeObject(element[1], element[0], linePrefix + '  ');
+      }
 
-        if (elements.length) {
-            output += '\n';
-
-            for (const element of elements) {
-                if (element[1] instanceof Array) {
-                    for (const item of element[1])
-                        output += serializeObject(item, element[0], linePrefix + '  ');
-
-                    continue;
-                }
-
-                output += serializeObject(element[1], element[0], linePrefix + '  ');
-            }
-
-            output += linePrefix;
-        }
+      output += linePrefix;
     }
+  }
 
-    return output + `</${name}>\n`;
+  return output + `</${name}>\n`;
 }
 
 export function kxml(topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): MethodDecorator {
-    return function (_target, _propertyKey, descriptor) {
-        const orig = descriptor.value as Function;
-        descriptor.value = async function (...args: any[]) {
-            const obj = await orig.apply(this, args);
-            const xml =
-                `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
-            const kxml = to_bin(xml);
+  return function (_target, _propertyKey, descriptor) {
+    const orig = descriptor.value as Function;
+    descriptor.value = async function (...args: any[]) {
+      const obj = await orig.apply(this, args);
+      const xml =
+        `<?xml version="1.0" encoding="${encoding}"?>` + serializeObject(obj, topName);
+      const kxml = to_bin(xml);
 
-            return Buffer.from(kxml.data);
-        } as unknown as any;
-    };
+      return Buffer.from(kxml.data);
+    } as unknown as any;
+  }
+}
+
+export function serviceKxml(service: string, topName: string = 'response', encoding: 'UTF-8' | 'SHIFT_JIS' = 'UTF-8'): (method: string) => MethodDecorator {
+  return function (method: string) {
+    const toKxml = kxml(topName, encoding);
+    return function (_target, _propertyKey, descriptor) {
+      const orig = descriptor.value as Function;
+      descriptor.value = async function (...args: any[]) {
+        const obj = await orig.apply(this, args);
+        return { [service]: { method, ...obj } };
+      } as unknown as any;
+
+      toKxml(_target, _propertyKey, descriptor);
+    }
+  }
 }
 
 // console.log(serializeObject({

@@ -58,6 +58,7 @@ async function main(): Promise<void> {
         throw new Error('invaild model');
       }
 
+      // eslint-disable-next-line prefer-const
       let [serviceName, method] = ctx.query.f.split('.');
 
       ctx.model = ctx.query.model;
@@ -65,7 +66,7 @@ async function main(): Promise<void> {
         name: serviceName,
         method,
       };
-      
+
       ctx.body = ctx.body[ctx.service.name];
       ctx.logger = ctx.service
         ? register(`logger:${ctx.service.name}`, {
@@ -90,9 +91,10 @@ async function main(): Promise<void> {
               `./services/${ctx.service.name}.js`
             );
           }
-          
+
           service = register(ctx.service.name, {
             useClass: module.default,
+
           });
         } catch (e) {
           logger.error(

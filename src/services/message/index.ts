@@ -1,16 +1,13 @@
-import { kxml } from '../../decorators/to-kxml.js';
-import { singleton } from 'tsyringe';
+import { serviceKxml } from '../../decorators/to-kxml.js';
 
-@singleton()
+const resp = serviceKxml('message');
+
 export default class {
-  @kxml()
+  @resp('get')
   async get(): Promise<object> {
     return {
-      message: {
-        $status: 0,
-        $expire: 60,
-        $method: 'get',
-      }
+      $status: 0,
+      $expire: 60,
     };
   }
 }
