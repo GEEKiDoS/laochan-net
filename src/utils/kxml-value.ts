@@ -15,13 +15,23 @@ export type ValueTypes = 's8' |
   'time';
 
 function vg(type: ValueTypes) {
-  return (value: unknown) => ({
-    $__type: type,
-    __value: value,
-  });
+  return (value: unknown, attrs?: object) => {
+    const result = {
+      $__type: type,
+      __value: value,
+    };
+
+    if (attrs) {
+      for (const key in attrs) {
+        result['$' + key] = attrs[key];
+      }
+    }
+
+    return attrs;
+  };
 }
 
-export const v: Record<ValueTypes, (value: unknown) => object> = {
+export const v: Record<ValueTypes, (value: unknown, attrs?: object) => object> = {
   s8: vg('s8'),
   u8: vg('u8'),
   s16: vg('s16'),

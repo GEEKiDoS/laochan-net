@@ -58,19 +58,22 @@ function serializeObject(obj: Object, name: string, linePrefix: string = '') {
     .filter(v => v[0].startsWith('$'))
     .map(v => [v[0].substring(1), v[1]]);
 
-  for (const attr of attrs) {
-    output += ` ${attr[0]}="${_.escape(attr[1])}"`;
-  }
-
   // handle kxml value shit
   const value = entries.find(v => v[0] == '__value');
 
   if (value && value[1] instanceof Array) {
-    output += ` __count="${value[1].length}"`;
+    attrs.push(['__count', value[1].length]);
   }
 
   if (value && value[1] instanceof Buffer) {
-    output += ` __size="${value[1].length}"`;
+    attrs.push(['__size', value[1].length]);
+  }
+
+  // the kbinxml library had issue when serializing non-ordered stuff
+  attrs.sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
+
+  for (const attr of attrs) {
+    output += ` ${attr[0]}="${_.escape(attr[1])}"`;
   }
 
   output += '>';
@@ -88,7 +91,8 @@ function serializeObject(obj: Object, name: string, linePrefix: string = '') {
       .join(' ');
   } else {
     const elements = entries
-      .filter(v => !v[0].startsWith('$'));
+      .filter(v => !v[0].startsWith('$'))
+      .sort((a, b) => a[0] < b[0] ? 1 : (a[0] > b[0] ? -1 : 0));
 
     if (elements.length) {
       output += '\n';
