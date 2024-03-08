@@ -11,6 +11,11 @@ interface CardAuth {
   refid: string,
 }
 
+interface GetRefId {
+  cardid: string,
+  passwd: string;
+}
+
 const resp = serviceKxml('cardmng');
 
 export default class {
@@ -25,9 +30,13 @@ export default class {
   }
 
   @resp('getrefid')
-  getrefid() {
-    return {
+  getrefid(ctx: Context) {
+    const { cardid, passwd } = ctx.body as GetRefId;
+    ctx.logger.info('registering %s with passwd %s.', cardid, passwd);
 
+    return {
+      $dataid: cardid,
+      $refid: cardid,
     }
   }
 

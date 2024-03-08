@@ -1,5 +1,6 @@
 import { serviceKxml } from "../../decorators/to-kxml.js";
 import { Context } from "../../types.js";
+import { v } from "../../utils/kxml-value.js";
 
 interface GetPCDataCall {
   ccode: string,
@@ -35,14 +36,8 @@ export default class {
       cm_movie_info: {
         $type: 3,
       },
-      monthly_mranking: {
-        $__type: 'u16',
-        __value: [],
-      },
-      total_mranking: {
-        $__type: 'u16',
-        __value: [],
-      },
+      monthly_mranking: v.u16([]),
+      total_mranking: v.u16([]),
       hitchart: [{
         $kind: 0,
         $period: 0,
@@ -62,98 +57,38 @@ export default class {
       pcdata: this.getPlayerPcData(cid),
       bind_eaappli: {},
       secret: {
-        flg1: {
-          $__type: 's64',
-          __value: [-1, -1, 1048575],
-        },
-        flg2: {
-          $__type: 's64',
-          __value: [-1, -1, 0],
-        },
-        flg3: {
-          $__type: 's64',
-          __value: [-1, -1, 0],
-        },
-        flg4: {
-          $__type: 's64',
-          __value: [-1, -1, 0],
-        },
+        flg1: v.s64([-1, -1, 1048575]),
+        flg2: v.s64([-1, -1, 0]),
+        flg3: v.s64([-1, -1, 0]),
+        flg4: v.s64([-1, -1, 0]),
       },
       favorite: {
-        sp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        sp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
+        sp_mlist: v.bin(Buffer.alloc(1, 0)),
+        sp_clist: v.bin(Buffer.alloc(1, 0)),
+        dp_mlist: v.bin(Buffer.alloc(1, 0)),
+        dp_clist: v.bin(Buffer.alloc(1, 0)),
       },
       extra_favorite: [{
         $folder_id: 0,
-        sp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        sp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
+        sp_mlist: v.bin(Buffer.alloc(1, 0)),
+        sp_clist: v.bin(Buffer.alloc(1, 0)),
+        dp_mlist: v.bin(Buffer.alloc(1, 0)),
+        dp_clist: v.bin(Buffer.alloc(1, 0)),
       }, {
         $folder_id: 0,
-        sp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        sp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_mlist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
-        dp_clist: {
-          $__type: 'bin',
-          __value: Buffer.alloc(1, 0),
-        },
+        sp_mlist: v.bin(Buffer.alloc(1, 0)),
+        sp_clist: v.bin(Buffer.alloc(1, 0)),
+        dp_mlist: v.bin(Buffer.alloc(1, 0)),
+        dp_clist: v.bin(Buffer.alloc(1, 0)),
       }],
       grade: {
         $dgid: -1,
         $sgid: -1,
-        g: {
-          $__type: 'u8',
-          __value: [0, 13, 3, 58],
-        }
+        g: v.u8([0, 13, 3, 58]),
       },
-      skin: {
-        $__type: 's16',
-        __value: new Array(20).fill(0),
-      },
-      tdjskin: {
-        $__type: 's16',
-        __value: [0, 0, 0, 0],
-      },
-      qprodata: {
-        $__type: 'u32',
-        __value: [0, 0, 0, 0, 0],
-      },
+      skin: v.s16(new Array(20).fill(0)),
+      tdjskin: v.s16([0, 0, 0, 0]),
+      qprodata: v.s16([0, 0, 0, 0, 0]),
       spdp_rival: {
         $flg: 1,
       },
